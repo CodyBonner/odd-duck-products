@@ -33,4 +33,6 @@ Learning Journal 3:
 Paper View
 The past couple weeks have been challenging but they have also been rewarding. I learned and struggled with object literals and constructors in the beginning but once I understood how to use them it became much easier. I still have a lot to learn about their capabilities. However I am enjoying utilizing the construction of HTML elements from inside of javascript so that way HTML does not stay super cluttered.
 
+While I am looking forward to what else I can accomplish utilizing the skills I've learned. I'm also concerned as to whether or not I am reaching the limitations of my knowledge thus far.
+
 I look forward to learning more and developing my skills further.
