@@ -3,10 +3,10 @@ odd duck product image selector repo using grid
 Utilize constructors and CSS styling to produce interactive images allowing
 future employees to select images and at the end showcase results.
 
+Integrating canvas into the previous lab, under the branch dataviz
 
 
-
-# LAB - 5
+# LAB - 12
 
 ## About Me
 
