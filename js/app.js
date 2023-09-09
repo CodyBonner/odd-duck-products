@@ -26,10 +26,14 @@ const globalVariables = {
   imageContainer: document.getElementById("images"),
   resultsContainer: document.getElementById("final-results"),
   buttonContainer: document.getElementById("button"),
+  chartCotainer: document.getElementById('results-chart'),
+
+  previousImages: [],
+  currentImages: [],
 };
 
 let clickCounter = 0;
-
+const maxVotes = 25;
 //constructor for ducks
 
 function DucksItems(name, filePath) {
@@ -51,36 +55,55 @@ function DucksItems(name, filePath) {
 
 //function that forces rendering
 function renderItems() {
+
   globalVariables.imageContainer.innerHTML = "";
   globalVariables.imageContainer.addEventListener("click", userClickImage);
 
   let itemOne =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  while(globalVariables.previousImages.includes(itemOne)){
+    console.log('previous images includes: item one'); //log to see if a repeat occured and if so fix it
+    itemOne = globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  }
   let itemTwo =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  while(globalVariables.previousImages.includes(itemTwo)){
+    console.log('previous images includes: item two'); //log to see if a repeat occured and if so fix it
+    itemTwo = globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  }
   let itemThree =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  globalVariables.items[getRandomInt(0, globalVariables.items.length)];
 
+  while(globalVariables.previousImages.includes(itemThree)){
+    console.log('previous images includes: item three'); //log to see if a repeat occured and if so fix it
+    itemThree = globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  }
+  //while loops that ensure there aren't two of the same thing on the same page
   while (itemOne === itemTwo || itemOne === itemThree) {
     itemOne =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
-
+  
   while (itemTwo === itemThree || itemTwo === itemOne) {
     itemTwo =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
+  //pushes variables into array currentImages
+  globalVariables.currentImages.push(itemOne, itemTwo, itemThree);
+
+  
+  console.log('global variables.previousImages: ',globalVariables.previousImages);
   //adds a counter to each images view variable as it appears on screen
   itemOne.views++;
   itemTwo.views++;
   itemThree.views++;
-
+  
   //calls render function of each item that's passed through
   itemOne.render();
   itemTwo.render();
   itemThree.render();
+  
 }
-
 //function to register user click
 
 function userClickImage(event) {
@@ -95,12 +118,19 @@ function userClickImage(event) {
 
     //console.log(globalVariables.items[i]);
   }
+
+
   clickCounter++;
   console.log(clickCounter);
+  //once user click, forces information of current images into previous images
+  globalVariables.previousImages = globalVariables.currentImages;
+  //resets current images to empty after user click
+  globalVariables.currentImages = [];
+  //restarts the process after user click
   renderItems();
 
   //section of loop that will only push rendering once condition is met
-  if (clickCounter >= 25) {
+  if (clickCounter >= maxVotes) {
     globalVariables.imageContainer.innerHTML = "";
     globalVariables.imageContainer.removeEventListener("click", userClickImage);
     const button = document.createElement("button");
@@ -109,7 +139,7 @@ function userClickImage(event) {
     globalVariables.buttonContainer.appendChild(button);
     button.addEventListener("click", buttonRemover);
   } else {
-    console.log("too few clicks");
+    //console.log("too few clicks");
   }
 }
 
@@ -121,6 +151,7 @@ function buttonRemover() {
 
 function resultsRendering() {
   globalVariables.resultsContainer.innerHTML = "";
+  
   const resultsElement = document.createElement("ul");
 
   for (let i = 0; i < globalVariables.items.length; i++) {
@@ -132,6 +163,8 @@ function resultsRendering() {
     resultsElement.appendChild(itemResult);
   }
   globalVariables.resultsContainer.appendChild(resultsElement);
+  globalVariables.chartCotainer.innerHTML = createChart();
+  globalVariables.resultsContainer.appendChild(globalVariables.chartCotainer);
 }
 
 //function designed to do the randomizing of images
@@ -140,6 +173,48 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
+}
+
+//section that creates a chart based on information provided
+
+function createChart() {
+  const ctx = document.getElementById("results-chart");
+  const itemLabels = [];
+  const itemVotes = [];
+  const itemViews = [];
+
+  for (let i = 0; i < globalVariables.items.length; i++) {
+    const itemElement = globalVariables.items[i];
+    itemLabels.push(itemElement.name);
+    itemVotes.push(itemElement.votes);
+    itemViews.push(itemElement.views);
+  }
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: itemLabels,
+      datasets: [
+        {
+          label: "Number of Votes",
+          data: itemVotes,
+          borderWidth: 1,
+        },
+        {
+          label: "Number of Views",
+          data: itemViews,
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
 }
 
 //section that calls render and results function
