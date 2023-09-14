@@ -25,6 +25,7 @@ To utilize the skills and tools I have achieved to showcase a unique and persona
 ### Lighthouse Accessibility Report Score
 
 ![LightHouse-Index](img/odd-ducks-lighthouse.PNG)
+![Lighthouse-Index-2](img/odd-ducks-lighthouse-2.PNG)
 
 ### Reflections and Comments
 
