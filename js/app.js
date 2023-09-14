@@ -22,18 +22,20 @@ const globalVariables = {
     new DucksItems("water can", "img/water-can.jpg"),
     new DucksItems("wine glass", "img/wine-glass.jpg"),
   ],
+  //example key value in existingCounts: unicorn: 3
 
   imageContainer: document.getElementById("images"),
   resultsContainer: document.getElementById("final-results"),
   buttonContainer: document.getElementById("button"),
-  chartCotainer: document.getElementById('results-chart'),
+  chartCotainer: document.getElementById("results-chart"),
 
   previousImages: [],
   currentImages: [],
 };
 
 let clickCounter = 0;
-const maxVotes = 25;
+const maxVotes = 3;
+
 //constructor for ducks
 
 function DucksItems(name, filePath) {
@@ -42,7 +44,8 @@ function DucksItems(name, filePath) {
   this.lastClicked = null;
   this.votes = 0;
   this.views = 0;
-
+  this.newVotes = [];
+  this.newViews = [];
   //section for rendering inside constructor
   DucksItems.prototype.render = function () {
     const itemImage = document.createElement("img");
@@ -55,54 +58,54 @@ function DucksItems(name, filePath) {
 
 //function that forces rendering
 function renderItems() {
-
   globalVariables.imageContainer.innerHTML = "";
   globalVariables.imageContainer.addEventListener("click", userClickImage);
 
   let itemOne =
-  globalVariables.items[getRandomInt(0, globalVariables.items.length)];
-  while(globalVariables.previousImages.includes(itemOne)){
-    console.log('previous images includes: item one'); //log to see if a repeat occured and if so fix it
-    itemOne = globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  while (globalVariables.previousImages.includes(itemOne)) {
+    //  console.log('previous images includes: item one'); //log to see if a repeat occured and if so fix it
+    itemOne =
+      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
   let itemTwo =
-  globalVariables.items[getRandomInt(0, globalVariables.items.length)];
-  while(globalVariables.previousImages.includes(itemTwo)){
-    console.log('previous images includes: item two'); //log to see if a repeat occured and if so fix it
-    itemTwo = globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  while (globalVariables.previousImages.includes(itemTwo)) {
+    //console.log('previous images includes: item two'); //log to see if a repeat occured and if so fix it
+    itemTwo =
+      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
   let itemThree =
-  globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
 
-  while(globalVariables.previousImages.includes(itemThree)){
-    console.log('previous images includes: item three'); //log to see if a repeat occured and if so fix it
-    itemThree = globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  while (globalVariables.previousImages.includes(itemThree)) {
+    //console.log('previous images includes: item three'); //log to see if a repeat occured and if so fix it
+    itemThree =
+      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
   //while loops that ensure there aren't two of the same thing on the same page
   while (itemOne === itemTwo || itemOne === itemThree) {
     itemOne =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
-  
+
   while (itemTwo === itemThree || itemTwo === itemOne) {
     itemTwo =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
   }
   //pushes variables into array currentImages
   globalVariables.currentImages.push(itemOne, itemTwo, itemThree);
 
-  
-  console.log('global variables.previousImages: ',globalVariables.previousImages);
+  //console.log('global variables.previousImages: ',globalVariables.previousImages);
   //adds a counter to each images view variable as it appears on screen
   itemOne.views++;
   itemTwo.views++;
   itemThree.views++;
-  
+
   //calls render function of each item that's passed through
   itemOne.render();
   itemTwo.render();
   itemThree.render();
-  
 }
 //function to register user click
 
@@ -119,9 +122,8 @@ function userClickImage(event) {
     //console.log(globalVariables.items[i]);
   }
 
-
   clickCounter++;
-  console.log(clickCounter);
+
   //once user click, forces information of current images into previous images
   globalVariables.previousImages = globalVariables.currentImages;
   //resets current images to empty after user click
@@ -139,7 +141,6 @@ function userClickImage(event) {
     globalVariables.buttonContainer.appendChild(button);
     button.addEventListener("click", buttonRemover);
   } else {
-    //console.log("too few clicks");
   }
 }
 
@@ -149,19 +150,45 @@ function buttonRemover() {
 }
 //function designed to render results
 
+
+let viewsArray = [];
+let votesArray = [];
+
 function resultsRendering() {
   globalVariables.resultsContainer.innerHTML = "";
-  
+
   const resultsElement = document.createElement("ul");
 
   for (let i = 0; i < globalVariables.items.length; i++) {
     const newItem = globalVariables.items[i];
+
     const itemResult = document.createElement("li");
 
     itemResult.textContent = `${newItem.name} was seen ${newItem.views} times and was selected ${newItem.votes} times.`;
 
-    resultsElement.appendChild(itemResult);
-  }
+    
+    votesArray.push(newItem.votes);
+    viewsArray.push(newItem.views);
+
+
+    //converting info to local storage
+    localStorage.setItem("votes", JSON.stringify(votesArray));
+    localStorage.setItem("views", JSON.stringify(viewsArray));
+
+     //retrieving info and restoring it
+     
+     //This retrieved votes array should have a length of the number of images but doesn't
+     const retrievedVotes = JSON.parse(localStorage.getItem("votes"));
+     const retrievedViews = JSON.parse(localStorage.getItem("views"));
+     
+     newItem.votes += retrievedVotes;
+     newItem.votes += retrievedViews;
+     
+     resultsElement.appendChild(itemResult);
+    }
+    
+ 
+
   globalVariables.resultsContainer.appendChild(resultsElement);
   globalVariables.chartCotainer.innerHTML = createChart();
   globalVariables.resultsContainer.appendChild(globalVariables.chartCotainer);
