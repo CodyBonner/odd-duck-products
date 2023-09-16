@@ -1,29 +1,31 @@
 "use strict";
 
-const globalVariables = {
-  items: [
-    new DucksItems("bag", "img/bag.jpg"),
-    new DucksItems("banana", "img/banana.jpg"),
-    new DucksItems("bathroom", "img/bathroom.jpg"),
-    new DucksItems("boots", "img/boots.jpg"),
-    new DucksItems("breakfast", "img/breakfast.jpg"),
-    new DucksItems("bubblegum", "img/bubblegum.jpg"),
-    new DucksItems("chair", "img/chair.jpg"),
-    new DucksItems("cthulhu", "img/cthulhu.jpg"),
-    new DucksItems("dog duck", "img/dog-duck.jpg"),
-    new DucksItems("dragon", "img/dragon.jpg"),
-    new DucksItems("pen", "img/pen.jpg"),
-    new DucksItems("pet sweep", "img/pet-sweep.jpg"),
-    new DucksItems("scissors", "img/scissors.jpg"),
-    new DucksItems("shark", "img/shark.jpg"),
-    new DucksItems("sweep", "img/sweep.png"),
-    new DucksItems("tauntaun", "img/tauntaun.jpg"),
-    new DucksItems("unicorn", "img/unicorn.jpg"),
-    new DucksItems("water can", "img/water-can.jpg"),
-    new DucksItems("wine glass", "img/wine-glass.jpg"),
-  ],
-  //example key value in existingCounts: unicorn: 3
+const items = [
+  new DucksItems("bag", "img/bag.jpg"),
+  new DucksItems("banana", "img/banana.jpg"),
+  new DucksItems("bathroom", "img/bathroom.jpg"),
+  new DucksItems("boots", "img/boots.jpg"),
+  new DucksItems("breakfast", "img/breakfast.jpg"),
+  new DucksItems("bubblegum", "img/bubblegum.jpg"),
+  new DucksItems("chair", "img/chair.jpg"),
+  new DucksItems("cthulhu", "img/cthulhu.jpg"),
+  new DucksItems("dog duck", "img/dog-duck.jpg"),
+  new DucksItems("dragon", "img/dragon.jpg"),
+  new DucksItems("pen", "img/pen.jpg"),
+  new DucksItems("pet sweep", "img/pet-sweep.jpg"),
+  new DucksItems("scissors", "img/scissors.jpg"),
+  new DucksItems("shark", "img/shark.jpg"),
+  new DucksItems("sweep", "img/sweep.png"),
+  new DucksItems("tauntaun", "img/tauntaun.jpg"),
+  new DucksItems("unicorn", "img/unicorn.jpg"),
+  new DucksItems("water can", "img/water-can.jpg"),
+  new DucksItems("wine glass", "img/wine-glass.jpg"),
+];
 
+let globalVariables = {
+  
+  //example key value in existingCounts: unicorn: 3
+  newProducts: [],
   imageContainer: document.getElementById("images"),
   resultsContainer: document.getElementById("final-results"),
   buttonContainer: document.getElementById("button"),
@@ -31,72 +33,66 @@ const globalVariables = {
 
   previousImages: [],
   currentImages: [],
+  clickCounter : 0,
 };
 
-let clickCounter = 0;
 const maxVotes = 25;
 
 //constructor for ducks
 
-function DucksItems(name, filePath) {
+function DucksItems(name, filePath, votes, views) {
   this.name = name;
   this.filePath = filePath;
   this.lastClicked = null;
-  this.votes = 0;
-  this.views = 0;
+  this.votes = votes ? votes: 0;
+  this.views = views ? views : 0;
   this.newVotes = [];
   this.newViews = [];
   //section for rendering inside constructor
-  DucksItems.prototype.render = function () {
+  }
+DucksItems.prototype.render = function () {
     const itemImage = document.createElement("img");
     itemImage.src = this.filePath;
     itemImage.alt = this.name;
 
     globalVariables.imageContainer.appendChild(itemImage);
   };
-}
+
+retrieveLocalData();
 
 //function that forces rendering
 function renderItems() {
   globalVariables.imageContainer.innerHTML = "";
   globalVariables.imageContainer.addEventListener("click", userClickImage);
 
-  let itemOne =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  let itemOne = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   while (globalVariables.previousImages.includes(itemOne)) {
     //  console.log('previous images includes: item one'); //log to see if a repeat occured and if so fix it
-    itemOne =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    itemOne = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   }
-  let itemTwo =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  let itemTwo = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   while (globalVariables.previousImages.includes(itemTwo)) {
     //console.log('previous images includes: item two'); //log to see if a repeat occured and if so fix it
-    itemTwo =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    itemTwo = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   }
-  let itemThree =
-    globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+  let itemThree = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
 
   while (globalVariables.previousImages.includes(itemThree)) {
     //console.log('previous images includes: item three'); //log to see if a repeat occured and if so fix it
-    itemThree =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    itemThree = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   }
   //while loops that ensure there aren't two of the same thing on the same page
   while (itemOne === itemTwo || itemOne === itemThree) {
-    itemOne =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    itemOne = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   }
 
   while (itemTwo === itemThree || itemTwo === itemOne) {
-    itemTwo =
-      globalVariables.items[getRandomInt(0, globalVariables.items.length)];
+    itemTwo = globalVariables.newProducts[getRandomInt(0, globalVariables.newProducts.length)];
   }
   //pushes variables into array currentImages
   globalVariables.currentImages.push(itemOne, itemTwo, itemThree);
 
-  //console.log('global variables.previousImages: ',globalVariables.previousImages);
+  
   //adds a counter to each images view variable as it appears on screen
   itemOne.views++;
   itemTwo.views++;
@@ -114,25 +110,28 @@ function userClickImage(event) {
 
   const target = event.target.alt;
 
-  for (let i = 0; i < globalVariables.items.length; i++) {
-    if (target === globalVariables.items[i].name) {
-      globalVariables.items[i].votes++;
+  for (let i = 0; i < globalVariables.newProducts.length; i++) {
+    if (target === globalVariables.newProducts[i].name) {
+      //console.log(items[i]);
+      globalVariables.newProducts[i].votes++;
+      //console.log(items[i]);
     }
 
-    //console.log(globalVariables.items[i]);
+    //console.log(items[i]);
   }
 
-  clickCounter++;
+  globalVariables.clickCounter++;
 
   //once user click, forces information of current images into previous images
   globalVariables.previousImages = globalVariables.currentImages;
   //resets current images to empty after user click
   globalVariables.currentImages = [];
   //restarts the process after user click
+  storeLocalData();
   renderItems();
 
   //section of loop that will only push rendering once condition is met
-  if (clickCounter >= maxVotes) {
+  if (globalVariables.clickCounter >= maxVotes) {
     globalVariables.imageContainer.innerHTML = "";
     globalVariables.imageContainer.removeEventListener("click", userClickImage);
     const button = document.createElement("button");
@@ -140,6 +139,8 @@ function userClickImage(event) {
     button.addEventListener("click", resultsRendering);
     globalVariables.buttonContainer.appendChild(button);
     button.addEventListener("click", buttonRemover);
+
+
   } else {
   }
 }
@@ -150,48 +151,25 @@ function buttonRemover() {
 }
 //function designed to render results
 
-
-let viewsArray = [];
-let votesArray = [];
-
 function resultsRendering() {
   globalVariables.resultsContainer.innerHTML = "";
 
   const resultsElement = document.createElement("ul");
 
-  for (let i = 0; i < globalVariables.items.length; i++) {
-    const newItem = globalVariables.items[i];
+  for (let i = 0; i < globalVariables.newProducts.length; i++) {
+    const newItem = globalVariables.newProducts[i];
 
     const itemResult = document.createElement("li");
 
     itemResult.textContent = `${newItem.name} was seen ${newItem.views} times and was selected ${newItem.votes} times.`;
 
-    
-    votesArray.push(newItem.votes);
-    viewsArray.push(newItem.views);
-
-
-    //converting info to local storage
-    localStorage.setItem("votes", JSON.stringify(votesArray));
-    localStorage.setItem("views", JSON.stringify(viewsArray));
-
-     //retrieving info and restoring it
-     
-     //This retrieved votes array should have a length of the number of images but doesn't
-     const retrievedVotes = JSON.parse(localStorage.getItem("votes"));
-     const retrievedViews = JSON.parse(localStorage.getItem("views"));
-     
-     newItem.votes += retrievedVotes;
-     newItem.votes += retrievedViews;
-     
-     resultsElement.appendChild(itemResult);
-    }
-    
- 
+    resultsElement.appendChild(itemResult);
+  }
 
   globalVariables.resultsContainer.appendChild(resultsElement);
   globalVariables.chartCotainer.innerHTML = createChart();
   globalVariables.resultsContainer.appendChild(globalVariables.chartCotainer);
+  localStorage.clear();
 }
 
 //function designed to do the randomizing of images
@@ -210,8 +188,8 @@ function createChart() {
   const itemVotes = [];
   const itemViews = [];
 
-  for (let i = 0; i < globalVariables.items.length; i++) {
-    const itemElement = globalVariables.items[i];
+  for (let i = 0; i < globalVariables.newProducts.length; i++) {
+    const itemElement = globalVariables.newProducts[i];
     itemLabels.push(itemElement.name);
     itemVotes.push(itemElement.votes);
     itemViews.push(itemElement.views);
@@ -244,6 +222,41 @@ function createChart() {
   });
 }
 
-//section that calls render and results function
+//function to store local data
 
+function storeLocalData() {
+  localStorage.setItem("globalState", JSON.stringify(globalVariables));
+}
+
+//function to retrieve local data
+
+function retrieveLocalData() {
+  let currentLocalStorageData = localStorage.getItem("globalState");
+  console.log(currentLocalStorageData);
+  if(currentLocalStorageData){
+    const storedLocalData = JSON.parse(currentLocalStorageData);
+    console.log('stored Local Data: ', storedLocalData);
+    for(let i = 0; i < storedLocalData.newProducts.length; i++){
+      const votedItem = storedLocalData.newProducts[i];
+      console.log(votedItem);
+      const newProduct = new DucksItems(
+        votedItem.name,
+        votedItem.filePath,
+        votedItem.votes,
+        votedItem.views
+      );
+      globalVariables.newProducts.push(newProduct);
+    }
+    globalVariables.clickCounter = storedLocalData.clickCounter;
+    console.log(storeLocalData.clickCounter)
+  } else{
+    for(let i = 0; i < items.length; i++){
+      globalVariables.newProducts.push(items[i]);
+    }
+  }
+}
+
+
+
+//section that calls render and results function
 renderItems();
