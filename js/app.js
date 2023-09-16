@@ -34,7 +34,7 @@ const globalVariables = {
 };
 
 let clickCounter = 0;
-const maxVotes = 3;
+const maxVotes = 25;
 
 //constructor for ducks
 
